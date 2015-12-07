@@ -8,15 +8,15 @@
 *	It uses routines in files gpioFunc.s and sysTimer.s
 *	Code is in ARMv6 assembler.
 ***************************************************************************/
-
+//required section
 .section .init
 //as by convention this is the entry point
 .globl _start
 _start:
 
+//this branch is required
 b main
-
-//important for compiling (see makefile)
+//required section
 .section .text
 
 main:
