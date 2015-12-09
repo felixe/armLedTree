@@ -14,20 +14,20 @@
 */
 
 /*
-* GetGpioAddress returns the base address of the GPIO region as a physical address
+* getGpioAddress returns the base address of the GPIO region as a physical address
 * in register r0.
 */
-.globl GetGpioAddress
-GetGpioAddress: 
+.globl getGpioAddress
+getGpioAddress: 
 	ldr r0,=0x20200000
 	mov pc,lr
 
 /*
-* SetGpioFunction sets the function of the GPIO register addressed by r0 to the
+* setGpioFunction sets the function of the GPIO register addressed by r0 to the
 * low  3 bits of r1.
 */
-.globl SetGpioFunction
-SetGpioFunction:
+.globl setGpioFunction
+setGpioFunction:
 	//for readability we are creating aliases
     	pinNum .req r0
     	pinFunc .req r1
@@ -45,7 +45,7 @@ SetGpioFunction:
 	pinNum .req r2
 
 	//and now we "call" the function
-	bl GetGpioAddress
+	bl getGpioAddress
 	gpioAddr .req r0
 
 	//calculate the block the given gpio pin resides in
@@ -64,7 +64,7 @@ SetGpioFunction:
 		lsl mask,pinNum				/* r3 = 11100..00 where the 111 is in the same position as the function in r1 */
 		.unreq pinNum
 
-		mvn mask,mask				/* r3 = 11..1100011..11 where the 000 is in the same poisiont as the function in r1 */
+		mvn mask,mask				/* r3 = 11..1100011..11 where the 000 is in the same position as the function in r1 */
 		oldFunc .req r2
 		ldr oldFunc,[gpioAddr]			/* r2 = existing code */
 		and oldFunc,mask			/* r2 = existing code with bits for this pin all 0 */
@@ -81,8 +81,8 @@ SetGpioFunction:
 /*
 * SetGpio sets the GPIO pin addressed by register r0 high if r1 != 0 and low otherwise. 
 */
-.globl SetGpio
-SetGpio:	
+.globl setGpio
+setGpio:	
 	pinNum .req r0
 	pinVal .req r1
 
@@ -93,7 +93,7 @@ SetGpio:
     	.unreq pinNum	
     	pinNum .req r2
 	//now validity checks are finished
-	bl GetGpioAddress
+	bl getGpioAddress
     	gpioAddr .req r0
 	
 	//change gpio address to corresponding pinBank (+4bytes for upper 22 pins, +0 for lower 32)
