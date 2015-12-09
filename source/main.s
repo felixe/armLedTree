@@ -11,6 +11,7 @@
 //this tells assembler to start at this point (and not at some other point in some other file)
 .section .init
 
+//Arrays with used pins
 .globl gndPins
 gndPins:	.word 2,3,4,17,27
 .globl voltPins
@@ -37,7 +38,7 @@ ldr r4, =50000
 //use subroutine to enable necessary GPIO pins
 bl enablePins
 //use subroutine to reset GPIO pins to defined value
-bl resetLoop
+bl resetPins
 
 pinNum .req r0
 pinVal .req r1

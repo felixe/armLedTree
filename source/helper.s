@@ -4,7 +4,6 @@
 *		
 *	helper.s contains helping subroutinges for main.s 
 ******************************************************************************/
-
 pinNum .req r0
 pinFunc .req r1
 
@@ -39,11 +38,11 @@ enablePins:
 
 .unreq pinFunc
 pinVal .req r1
-.globl resetLoop
+.globl resetPins
 /***************************************************
 *       RESET everything subroutine
 ****************************************************/
-resetLoop:
+resetPins:
 
 	push {lr}
 	resetPinsLoop:
