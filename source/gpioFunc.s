@@ -23,11 +23,11 @@ GetGpioAddress:
 	mov pc,lr
 
 /*
-* SetGpioFunction sets the function of the GPIO register addressed by r0 to the
+* setGpioFunction sets the function of the GPIO register addressed by r0 to the
 * low  3 bits of r1.
 */
-.globl SetGpioFunction
-SetGpioFunction:
+.globl setGpioFunction
+setGpioFunction:
 	//for readability we are creating aliases
     	pinNum .req r0
     	pinFunc .req r1
@@ -79,10 +79,10 @@ SetGpioFunction:
 		pop {pc}
 
 /*
-* SetGpio sets the GPIO pin addressed by register r0 high if r1 != 0 and low otherwise. 
+* setGpio sets the GPIO pin addressed by register r0 high if r1 != 0 and low otherwise. 
 */
-.globl SetGpio
-SetGpio:	
+.globl setGpio
+setGpio:	
 	pinNum .req r0
 	pinVal .req r1
 
