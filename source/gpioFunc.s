@@ -118,3 +118,105 @@ setGpio:
 	.unreq bitSet
 	.unreq gpioAddr
 	pop {pc}
+
+/*
+*Enable pins used for raspberry LED matrix. Namely gnd: 2,3,4,17,27; V:  14,15,18,23,24
+*/
+.globl enablePiPins
+enablePiPins:
+	push {lr}
+	// GROUND PINS (inside pin row on raspberry)
+	pinNum .req r0
+	pinFunc .req r1
+	mov pinNum,#2
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#3
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#4
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#17
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#27
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	// VOLTAGE PINS (outside pin row on raspberry)
+	mov pinNum,#14
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#15
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#18
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#23
+	mov pinFunc,#1
+	bl setGpioFunction
+	
+	mov pinNum,#24
+	mov pinFunc,#1
+	bl setGpioFunction
+	pop {pc}	
+
+/***************************************************
+*       RESET above raspberry pins according to our usage
+****************************************************/
+.globl resetPiPins
+resetPiPins:
+	push {lr}
+	pinVal .req r1
+	///////Set all GND pins high:
+	//first gnd
+	mov pinNum,#2
+	mov pinVal,#1
+	bl setGpio
+	
+	mov pinNum,#3
+	mov pinVal,#1
+	bl setGpio
+	
+	mov pinNum,#4
+	mov pinVal,#1
+	bl setGpio
+	
+	mov pinNum,#17
+	mov pinVal,#1
+	bl setGpio
+	
+	mov pinNum,#27
+	mov pinVal,#1
+	bl setGpio
+	
+	//////set all V pins low:
+	mov pinNum,#14
+	mov pinVal,#0
+	bl setGpio
+	
+	mov pinNum,#15
+	mov pinVal,#0
+	bl setGpio
+	
+	mov pinNum,#18
+	mov pinVal,#0
+	bl setGpio
+	
+	mov pinNum,#23
+	mov pinVal,#0
+	bl setGpio
+	
+	mov pinNum,#24
+	mov pinVal,#0
+	bl setGpio
+	pop {pc}	

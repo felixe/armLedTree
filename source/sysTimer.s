@@ -1,5 +1,5 @@
 /******************************************************************************
-*	gpioFunc.s
+*	sysTimer.s
 *	Felix Erlacher
 *	based on Alex Chadwicks "baking Pi" code (http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/index.html)
 *		
@@ -32,9 +32,10 @@ getTimeStamp:
 */
 .globl wait
 wait:
+//	push {lr}
+	stmfd sp!, {r0-r10,lr}
 	delay .req r2
 	mov delay,r0	
-	push {lr}
 	bl getTimeStamp
 	start .req r3
 	mov start,r0
@@ -49,4 +50,6 @@ wait:
 		
 	.unreq delay
 	.unreq start
-	pop {pc}
+	ldmfd sp!, {r0-r10,pc}
+//	mov pc,lr
+//	pop {pc}
