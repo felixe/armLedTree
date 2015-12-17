@@ -1,11 +1,10 @@
-/***************************0*************************************************
+/****************************************************************************
 *       bitMask2LED.s
 *       Felix Erlacher, Rainer Böhme, Pascal Schöttle
 *       
 *	r0 is bitmask to be led
 *	r1 is multiplicator how long the leds should shine
-*	The 1s in
-*	this bitmask are then lighted up on the 5x5 LED Matrix
+*	The 1s in the r0 bitmask are then lighted up on the 5x5 LED Matrix
 *       Code is in ARMv6 assembler.
 ***************************************************************************/
 
@@ -25,8 +24,7 @@ bitMask2LED:
 	//r2 contains 1s for anode (V) pins --> 00000001100001001100000000000000
 	ldr r2,=0x0184C000
 	
-	
-	//this loop goes through all leds to make tem visible
+	//this loop repeats below loops according to multiplier to make LEDs visible
 	flashLoop:
 	        //flashloop counter
 	        subs r8,r8,#1
@@ -39,42 +37,39 @@ bitMask2LED:
 	        ldr r5,=0
 	        //or register to gather all anode pins for on row
 	        ldr r10,=0
-	//Basic logic: go 5 times through Anodes and gather them in r10, ligth em up (depending if respective bit in r6 is 1). Than move Cathode one further and repeat.
+	//Basic logic: go 5 times through Anodes and gather (OR) them in r10, ligth em up (depending if respective bit in r6 is 1). Than move Cathode one further and repeat.
 	shiftAnod:
 	        //move 1 in r3 left (by rotating it right 31 to preserve mask) until below 1 in r1
 	        tst r2,r4
 	        moveq r4,r4, ror #31
 	        beq shiftAnod
-	
 	shiftCath:
 	        //same  with r3 und r2
 	        tst r1,r3
 	        moveq r3,r3, ror #31
 	        beq shiftCath
 	
-	coreIO:
 	        //check if LED bitmask has a 1 at the r5th bit, and only light up current LEDs
 	        mov r0, r6, lsr r5 
 	        tst r0, #1
 	        //always gather (or) the 5 anodes for one row to light them up together
 	        orrne r10,r10,r4
-	
-	endCore:
-	        //25 LED counter 
+			
+		//25 LED counter, has to count here because of bne below. Is checked lower down.
 	        add r5,r5,#1
-	
+
 	        //move once to make r4 move to next 1 in shiftAnod      
 	        mov r4,r4, ror #31
 	        //only move Cathodes after 5 turns. To save register this is done by comparing it with initial value+1.
-	        cmp r4,#0x02000000 //TODO: replace with larger than r2 (unisgned)
-	        //while not even do not shift cathodes
-	        bne shiftAnod
-	
+	        cmp r4,r2 //compare with init position of r2
+	        //only shift when r4 higher than r2
+		blo shiftAnod
+	coreIO:
 	        //light em up by feeding OR register of Anodes(r10) and one Cathode(r3) 
 	        //gpset register for anodes (+)
 	        str r10, [r9,#28]
 	        //gpclr register for cathodes (-)
-	str r3, [r9,#40]
+		str r3, [r9,#40]
 	
 	        //wait between rows
 	        ldr r0,=40
@@ -87,11 +82,11 @@ bitMask2LED:
 	
 	        //and again, move r4 once to make shure it moves on in shiftCath
 	        mov r3,r3, ror #31
-	
+
 	        //check here if 25 LED counter is negative and ev. branch
 	        cmp r5, #25
-	        beq flashLoop
-	
-	        b shiftAnod
+	        bne shiftAnod
+
+	        b flashLoop
 	end:	
 		ldmfd sp!, {r0-r12,pc}
