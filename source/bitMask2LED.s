@@ -12,11 +12,12 @@
 
 .globl bitMask2LED
 bitMask2LED:
+	stmfd sp!, {r0-r12,lr}
+	
 	//r6 contains bitmask of leds to shine 
 	mov r6, r0	
 	//counter for flashLoop. One loop takes ~200microsecs, this is the multiplicator
 	mov r8, r1
-	push {lr}
 	//address of gpio controller
 	ldr r9,=0x20200000
 	//r1 contains 1s for cathode (gnd) pins with least significant leftmost (00001000000000100000000000011100)
@@ -35,7 +36,7 @@ bitMask2LED:
 	        //same procedure  sr3, 2^14=16384
 	        ldr r4,=0x00004000
 	        //r5 is counter for LED mask (r6 contains only 25 LEDS but 32 bits)
-	        ldr r5,=24
+	        ldr r5,=0
 	        //or register to gather all anode pins for on row
 	        ldr r10,=0
 	//Basic logic: go 5 times through Anodes and gather them in r10, ligth em up (depending if respective bit in r6 is 1). Than move Cathode one further and repeat.
@@ -52,15 +53,15 @@ bitMask2LED:
 	        beq shiftCath
 	
 	coreIO:
-	        //check if LED bitmask has a 1 at the r5th bit, and only the light up current LEDs
-	        mov r0, r6, lsr r5
+	        //check if LED bitmask has a 1 at the r5th bit, and only light up current LEDs
+	        mov r0, r6, lsr r5 
 	        tst r0, #1
 	        //always gather (or) the 5 anodes for one row to light them up together
 	        orrne r10,r10,r4
 	
 	endCore:
 	        //25 LED counter 
-	        sub r5,r5,#1
+	        add r5,r5,#1
 	
 	        //move once to make r4 move to next 1 in shiftAnod      
 	        mov r4,r4, ror #31
@@ -88,11 +89,9 @@ bitMask2LED:
 	        mov r3,r3, ror #31
 	
 	        //check here if 25 LED counter is negative and ev. branch
-	        movs r5, r5
-	        bmi flashLoop
+	        cmp r5, #25
+	        beq flashLoop
 	
 	        b shiftAnod
 	end:	
-		pop {pc}
-
-
+		ldmfd sp!, {r0-r12,pc}
